@@ -1,5 +1,6 @@
 # ![BigBrotherBot](http://i.imgur.com/7sljo4G.png) b3-plugin-discord
 Sends report messages to Discord using Discord webhooks. 
+
 ---------
 ### Requirements
 
