@@ -1,14 +1,14 @@
 # ![BigBrotherBot](http://i.imgur.com/7sljo4G.png) b3-plugin-discord
 Sends report messages to Discord using Discord webhooks. 
-
-### Requirements
 ---------
+### Requirements
+
 
 - `requests` module
   - install with `pip install requests`
-
-### Installation
 ---------
+### Installation
+
 1. Create/Edit a Discord webhook in the desired channel.
 2. Paste discord.xml in b3/extplugins/conf.
 3. Paste discord.py in b3/extplugins.
@@ -23,12 +23,12 @@ Sends report messages to Discord using Discord webhooks.
 
 ***IMPORTANT: Restart map after plugin is loaded!***
 
-  
+---------  
 ### Usage
----------
+
 !report &lt;playername&gt;
 
-
-### Disclaimer
 ---------
+### Disclaimer
+
 The author of this opensource plugin endorse NO responsibility whatsoever for any problem that might arise when using this tool.
