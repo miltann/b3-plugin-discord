@@ -4,6 +4,8 @@ Sends report messages to Discord using Discord webhooks.
 ![Report Example](https://i.gyazo.com/453dcbf99baf2f92067919996666b9ad.png)
 ![Report Example](https://i.gyazo.com/20fc9da7f1e6f07ce3f217b69f5489c6.png)
 
+See it in action: https://discord.gg/x499c9k
+
 ---------
 ### Requirements
 
