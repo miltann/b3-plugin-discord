@@ -139,7 +139,7 @@ class DiscordPlugin(b3.plugin.Plugin):
 
             #constructing embedded message to be sent on server
             if 'cod8' in game.lower():
-                embed = Webhook(self.url, color=0x97C928)
+                embed = DiscordEmbed(self.url, color=0x97C928)
                 embed.set_gamename(name='Call of Duty: Modern Warfare 3', icon='https://orig00.deviantart.net/9af1/f/2011/310/2/1/modern_warfare_3_logo_by_wifsimster-d4f9ozd.png')
 
                 #changing mapview according to mapname
