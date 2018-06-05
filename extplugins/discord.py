@@ -179,11 +179,11 @@ class DiscordPlugin(b3.plugin.Plugin):
                 if 'mp_la' in map.lower():
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/ba/Aftermath_loading_screen_BOII.png')
                 elif 'carrier' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/a/a6/Lockdown_loading_screen_MW3.PNG')
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/88/Carrier_loadscreen_BOII.png')
                 elif 'drone' in map.lower():
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/5b/Drone_loadscreen_BOII.png')
                 elif 'express' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/d/d1/Express_Load_Screen_BOII.png')
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/b1/Express_bullet_train_BOII.png/revision/latest?cb=20130224044951')
                 elif 'hijacked' in map.lower():
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/4/42/Hijacked..png/revision/latest?cb=20130407201845&path-prefix=de')
                 elif 'meltdown' in map.lower():
@@ -195,7 +195,7 @@ class DiscordPlugin(b3.plugin.Plugin):
                 elif 'raid' in map.lower():
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Raid_Load_Screen_BOII.png')
                 elif 'slums' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/0/04/Slums_Load_Screen_BOII.png')
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/0/04/Slums_Load_Screen_BOII.png/revision/latest?cb=20121209080826')
                 elif 'village' in map.lower():
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f7/Standoff..png/revision/latest?cb=20130429072412&path-prefix=de')
                 elif 'turbine' in map.lower():
