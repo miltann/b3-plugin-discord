@@ -9,8 +9,14 @@
 # - using a configuration file to get webhook
 # 29.04.2018 - v1.2 - WatchMiltan
 # - it actually works now
+# 05.06.2018 - v1.3 - WatchMiltan
+# - partial rewrite, adjusted colors
+# - corrected json parsing
+# - added comments for easier comprehension
+#
 
-__version__ = '1.2'
+
+__version__ = '1.3gh'
 __author__  = 'WatchMiltan'
 
 #b3 libaries
@@ -19,40 +25,24 @@ import b3.events
 import b3.plugin
 
 #libaries for webhook and embed
-import json
 import requests #pip install requests, if missing
-import time
+import json
 import datetime
+import time
 import re
 from collections import defaultdict
 
 
 #discord embed formatting
-class Webhook:
+class DiscordEmbed: #discord embed formatting
     def __init__(self, url, **kwargs):
         self.url = url
         self.color = kwargs.get('color')
-        self.gamename = kwargs.get('gamename')
-        self.gamename_icon = kwargs.get('gamename_icon')
-        self.textfield = kwargs.get('textfield', [])
-        self.mapview = kwargs.get('mapview')
-        self.footnote = kwargs.get('footnote')
-        self.footnote_icon = kwargs.get('footnote_icon')
-        self.timestamp = kwargs.get('timestamp')
-
-
-    def textbox(self,**kwargs):
-        name = kwargs.get('name')
-        value = kwargs.get('value')
-        inline = kwargs.get('inline', True)
-
-        field = {
-        'name' : name,
-        'value' : value,
-        'inline' : inline
-        }
-
-        self.textfield.append(field)
+        self.gamename = kwargs.get('author')
+        self.gamename_icon = kwargs.get('author_icon')
+        self.fields = kwargs.get('fields', [])
+        self.mapview = kwargs.get('thumbnail')
+        self.footnote = kwargs.get('footer')
 
     def set_gamename(self, **kwargs):
         self.gamename = kwargs.get('name')
@@ -61,53 +51,48 @@ class Webhook:
     def set_mapview(self, url):
         self.mapview = url
 
+    def textbox(self,**kwargs):
+        name = kwargs.get('name')
+        value = kwargs.get('value')
+        inline = kwargs.get('inline', True)
+        field = {'name' : name, 'value' : value, 'inline' : inline}
+        self.fields.append(field)
+
     def set_footnote(self,**kwargs):
         self.footnote = kwargs.get('text')
-        self.footnote_icon = kwargs.get('icon')
-        timestamp = kwargs.get('timestamp')
-        if timestamp:
-            self.timestamp = str(datetime.datetime.utcfromtimestamp(time.time()))
-        else:
-            self.timestamp = str(datetime.datetime.utcfromtimestamp(timestamp))
+        self.ts = str(datetime.datetime.utcfromtimestamp(time.time()))
 
     @property
-    def json(self,*arg):
+    def push(self, *arg): #compiling push data to be sent to discord
         data = {}
-
-        data['embeds'] = []
+        data["embeds"] = []
         embed = defaultdict(dict)
-        if self.gamename:
-            embed['gamename']['name'] = self.gamename
-        if self.gamename_icon:
-            embed['gamename']['icon_url'] = self.gamename_icon
-        if self.color:
-            embed['color'] = self.color
-        if self.mapview:
-            embed['mapview']['url'] = self.mapview
-        if self.footnote:
-            embed['footnote']['text'] = self.footnote
-        if self.timestamp:
-            embed['timestamp'] = self.timestamp
 
-        if self.textfield:
-            embed['textfield'] = []
-            for field in self.textfield:
+        if self.gamename: embed["author"]["name"] = self.gamename
+        if self.gamename_icon: embed["author"]["icon_url"] = self.gamename_icon
+        if self.color: embed["color"] = self.color
+        if self.mapview: embed["thumbnail"]['url'] = self.mapview
+        if self.footnote: embed["footer"]['text'] = self.footnote
+        if self.ts: embed["timestamp"] = self.ts
+
+        if self.fields:
+            embed["fields"] = []
+            for field in self.fields:
                 f = {}
-                f['name'] = field['name']
-                f['value'] = field['value']
-                f['inline'] = field['inline']
-                embed['textfield'].append(f)
+                f["name"] = field['name']
+                f["value"] = field['value']
+                f["inline"] = field['inline']
+                embed["fields"].append(f)
 
-        data['embeds'].append(dict(embed))
-        empty = all(not d for d in data['embeds'])
-        if empty:
-            data['embeds'] = []
-        return json.dumps(data, indent=4)
+        data["embeds"].append(dict(embed))
+        empty = all(not d for d in data["embeds"])
+        if empty: data['embeds'] = []
+        return json.dumps(data)
 
-    def post(self):
+    def post(self): #push data to webhook
         headers = {'Content-Type': 'application/json'}
-        result = requests.post(self.url, data=self.json, headers=headers)
-
+        result = requests.post(self.url, data=self.push, headers=headers)
+        
 
 class DiscordPlugin(b3.plugin.Plugin):
     _adminPlugin = None
@@ -154,7 +139,7 @@ class DiscordPlugin(b3.plugin.Plugin):
 
             #constructing embedded message to be sent on server
             if 'cod8' in game.lower():
-                embed = Webhook(self.url, color=44)
+                embed = Webhook(self.url, color=0x97C928)
                 embed.set_gamename(name='Call of Duty: Modern Warfare 3', icon='https://orig00.deviantart.net/9af1/f/2011/310/2/1/modern_warfare_3_logo_by_wifsimster-d4f9ozd.png')
 
                 #changing mapview according to mapname
@@ -188,7 +173,7 @@ class DiscordPlugin(b3.plugin.Plugin):
                     embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
 
             elif 't6' in game.lower():
-                embed = Webhook(self.url, color=12)
+                embed = Webhook(self.url, color=0x000000)
                 embed.set_gamename(name='Call of Duty: Black Ops 2', icon='https://i.pinimg.com/originals/5a/44/5c/5a445c5c733c698b32732550ec797e91.jpg')
 
                 if 'mp_la' in map.lower():
@@ -223,13 +208,13 @@ class DiscordPlugin(b3.plugin.Plugin):
                     embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
 
             else:
-                embed = Webhook(self.url, color=77)
+                embed = Webhook(self.url, color=0xff0000)
                 embed.set_gamename(name='Cheater Report')
                 embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
 
-            embed.textbox(name='Reported Player',value=cheater[1:-1])
-            embed.textbox(name='Server',value=server)
-            embed.set_footnote(text='reported by '+ reporter, timestamp=True)
+            embed.textbox(name='Reported Player', value=cheater[1:-1])
+            embed.textbox(name='Server', value=server)
+            embed.set_footnote(text='reported by '+ reporter)
             embed.post()
             self.debug('Report message sent to Discord.')
             client.message('^2Player has been reported on Discord!')
