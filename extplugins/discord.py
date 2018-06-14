@@ -1,18 +1,39 @@
-# Discord Plugin for BigBrotherBot(B3) (www.bigbrotherbot.com)
-# Copyright (c) 2018 Miltan aka WatchMiltan
 #
-# LOG:
-# 02.04.2018 - v1.0 - WatchMiltan
-# - first release.
-# 23.04.2018 - v1.1 - WatchMiltan
-# - added thumbnails and icons for BO2
-# - using a configuration file to get webhook
-# 29.04.2018 - v1.2 - WatchMiltan
-# - it actually works now
-# 05.06.2018 - v1.3 - WatchMiltan
-# - partial rewrite, adjusted colors
-# - corrected json parsing
-# - added comments for easier comprehension
+# ################################################################### #
+#                                                                     #
+#  Discord Plugin for BigBrotherBot(B3) (www.bigbrotherbot.com)       #
+#  Copyright (c) 2018 Miltan aka WatchMiltan                          #
+#                                                                     #
+#  This program is free software; you can redistribute it and/or      #
+#  modify it under the terms of the GNU General Public License        #
+#  as published by the Free Software Foundation; either version 2     #
+#  of the License, or (at your option) any later version.             #
+#                                                                     #
+#  This program is distributed in the hope that it will be useful,    #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of     #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the       #
+#  GNU General Public License for more details.                       #
+#                                                                     #
+#  You should have received a copy of the GNU General Public License  #
+#  along with this program; if not, write to the Free Software        #
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA      #
+#  02110-1301, USA.                                                   #
+#                                                                     #
+# ################################################################### #
+#
+#
+#  CHANGELOG:
+#  02.04.2018 - v1.0 - WatchMiltan
+#  - first release.
+#  23.04.2018 - v1.1 - WatchMiltan
+#  - added thumbnails and icons for BO2
+#  - using a configuration file to get webhook
+#  29.04.2018 - v1.2 - WatchMiltan
+#  - it actually works now
+#  05.06.2018 - v1.3 - WatchMiltan
+#  - partial rewrite, adjusted colors
+#  - corrected json parsing
+#  - added comments for easier comprehension
 #
 
 
@@ -25,7 +46,7 @@ import b3.events
 import b3.plugin
 
 #libaries for webhook and embed
-import requests #pip install requests, if missing
+import requests 
 import json
 import datetime
 import time
@@ -34,7 +55,7 @@ from collections import defaultdict
 
 
 #discord embed formatting
-class DiscordEmbed: #discord embed formatting
+class DiscordEmbed: 
     def __init__(self, url, **kwargs):
         self.url = url
         self.color = kwargs.get('color')
