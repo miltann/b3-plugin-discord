@@ -194,7 +194,7 @@ class DiscordPlugin(b3.plugin.Plugin):
                     embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
 
             elif 't6' in game.lower():
-                embed = Webhook(self.url, color=1)
+                embed = DiscordEmbed(self.url, color=1)
                 embed.set_gamename(name='Call of Duty: Black Ops 2', icon='https://i.pinimg.com/originals/5a/44/5c/5a445c5c733c698b32732550ec797e91.jpg')
 
                 if 'mp_la' in map.lower():
@@ -229,8 +229,8 @@ class DiscordPlugin(b3.plugin.Plugin):
                     embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
 
             else:
-                embed = Webhook(self.url, color=0xff0000)
-                embed.set_gamename(name='Cheater Report')
+                embed = DiscordEmbed(self.url, color=0xff0000)
+                embed.set_gamename(name='Cheater Report: '+ game)
                 embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
 
             embed.textbox(name='Reported Player', value=cheater[1:-1])
