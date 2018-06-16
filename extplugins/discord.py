@@ -34,10 +34,11 @@
 #  - partial rewrite, adjusted colors
 #  - corrected json parsing
 #  - added comments for easier comprehension
+#  16.06.2018 - v1.4 - WatchMiltan
+#  - added thumbnails and icons for cod4
 #
 
-
-__version__ = '1.3gh'
+__version__ = '1.4gh'
 __author__  = 'WatchMiltan'
 
 #b3 libaries
@@ -227,6 +228,55 @@ class DiscordPlugin(b3.plugin.Plugin):
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/52/Nuketown_2015..png/revision/latest?cb=20130210235047&path-prefix=de')
                 else:
                     embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
+                    
+            elif 'cod4' in game.lower():
+                embed = DiscordEmbed(self.url, color=0x296731)
+                embed.set_gamename(name='Call of Duty 4: Modern Warfare', icon='http://orig05.deviantart.net/8749/f/2008/055/0/c/call_of_duty_4__dock_icon_by_watts240.png')
+
+                if 'backlot' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/0/0f/Backlot_loadscreen_CoD4.jpg')
+                elif 'bloc' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/9d/Bare_Load_Screen_Bloc_CoD4.jpg')
+                elif 'bog' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Bog_Map_Image_CoD4.jpg/revision/latest?cb=20100723075648')
+                elif 'cargoship' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/e5/Cod4_map_wetwork.jpg')
+                elif 'citystreets' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/92/Cod4_map_district.jpg')
+                elif 'convoy' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/3/3c/Bare_Load_Screen_Ambush_CoD4.jpg/revision/latest?cb=20100723075603')
+                elif 'countdown' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/e9/Bare_Load_Screen_Countdown_CoD4.jpg/revision/latest?cb=20100723075829')
+                elif 'crash' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/90/Bare_Load_Screen_Crash_CoD4.jpg/revision/latest?cb=20110727174701')
+                elif 'crossfire' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/53/Cod4_map_crossfire.jpg/revision/latest?cb=20100723075954')
+                elif 'farm' in map.lower():
+                    embed.set_mapview('')
+                elif 'overgrown' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/7/7d/Bare_Load_Screen_Overgrown_CoD4.jpg/revision/latest?cb=20110727174104')
+                elif 'pipeline' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Cod4_map_pipeline.jpg/revision/latest?cb=20100723080432')
+                elif 'shipment' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/9b/Shipment_Load.jpg/revision/latest?cb=20100723080524')
+                elif 'showdown' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/1/1f/Showdown_Overview_CoD4.jpg/revision/latest?cb=20120519205219')                    
+                elif 'strike' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/b0/Loadscreen_mp_strike.jpg/revision/latest?cb=20100712195725')
+                elif 'vacant' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f6/Cod4_map_vacant.jpg/revision/latest?cb=20100723080839')
+                elif 'snow' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f7/Bare_Load_Screen_Winter_Crash_CoD4.jpg/revision/latest?cb=20100723080720')
+                elif 'broadcast' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/ec/Broadcast_loading_screen_CoD4.jpg/revision/latest?cb=20100723080927')
+                elif 'carentan' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/95/Carentan_View_1_WWII.jpg/revision/latest?cb=20171223000154')
+                elif 'creek' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/e1/CreekCOD4.jpg/revision/latest?cb=20100723075941')
+                elif 'killhouse' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/4/48/Cod4-killhouse.jpg/revision/latest?cb=20100723081127')
+                else:
+                    embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')                    
 
             else:
                 embed = DiscordEmbed(self.url, color=0xff0000)
