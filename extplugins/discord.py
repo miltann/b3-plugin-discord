@@ -26,7 +26,7 @@
 #  02.04.2018 - v1.0 - WatchMiltan
 #  - first release.
 #  23.04.2018 - v1.1 - WatchMiltan
-#  - added thumbnails and icons for BO2
+#  - added thumbnails and icons for t6 (BO2)
 #  - using a configuration file to get webhook
 #  29.04.2018 - v1.2 - WatchMiltan
 #  - it actually works now
@@ -35,7 +35,8 @@
 #  - corrected json parsing
 #  - added comments for easier comprehension
 #  16.06.2018 - v1.4 - WatchMiltan
-#  - added thumbnails and icons for cod4
+#  - added thumbnails and icons for cod4 
+#  - added thumbnails and icons for cod6 (MW2)
 #
 
 __version__ = '1.4gh'
@@ -278,8 +279,47 @@ class DiscordPlugin(b3.plugin.Plugin):
                 else:
                     embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')                    
 
+            elif 'cod6' in game.lower():
+                embed = DiscordEmbed(self.url, color=0xBFB8E3)
+                embed.set_gamename(name='Call of Duty: Modern Warfare 2', icon='https://i.gyazo.com/758b6933287392106bfdddc24b09d502.png')
+
+                if 'afghan' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/83/Afghan_loading_screen_MW2.png/revision/latest?cb=20130310131229')
+                elif 'boneyard' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/ef/Scrapyard.jpg/revision/latest?cb=20100720174413')
+                elif 'brecourt' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/c/cc/Wasteland.jpg/revision/latest?cb=20100720174520')
+                elif 'checkpoint' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/9f/Karachi-prev.jpg/revision/latest?cb=20100720174412')
+                elif 'derail' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/20/Derail.jpg/revision/latest?cb=20100720174408')
+                elif 'estate' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/91/Estate.jpg/revision/latest?cb=20100720174409')
+                elif 'favela' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Favela_Map_MW2.jpg/revision/latest?cb=20100720174410')
+                elif 'highrise' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/4/49/Highrise-promo.jpg/revision/latest?cb=20100720174411')
+                elif 'invasion' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/95/Invasion_MW2.jpg/revision/latest?cb=20100720174410')
+                elif 'nightshift' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/d/d2/Skidrow.jpg/revision/latest?cb=20100720174516')
+                elif 'quarry' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/8a/Loadscreen_mp_quarry.jpg/revision/latest?cb=20091207173135')
+                elif 'rundown' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/3/3a/Rundown-prev.jpg/revision/latest?cb=20100720174412')
+                elif 'rust' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/3/33/Rust.jpg/revision/latest?cb=20100720174413')
+                elif 'subbase' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/1/1e/Sub_Base.jpg/revision/latest?cb=20100720174517')
+                elif 'terminal' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/1/14/Bare_Load_Screen_Terminal_MW2.jpg/revision/latest?cb=20100720174519')
+                elif 'underpass' in map.lower():
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/b5/Underpass.jpg/revision/latest?cb=20100720174519')
+                else:
+                    embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')                    
+                    
             else:
-                embed = DiscordEmbed(self.url, color=0xff0000)
+                embed = DiscordEmbed(self.url, color=0xFF0000)
                 embed.set_gamename(name='Cheater Report: '+ game)
                 embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
 
