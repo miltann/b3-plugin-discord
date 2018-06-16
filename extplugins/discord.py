@@ -252,7 +252,7 @@ class DiscordPlugin(b3.plugin.Plugin):
                 elif 'crossfire' in map.lower():
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/53/Cod4_map_crossfire.jpg/revision/latest?cb=20100723075954')
                 elif 'farm' in map.lower():
-                    embed.set_mapview('')
+                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/82/Bare_Load_Screen_Downpour_CoD4.jpg/revision/latest?cb=20110727175118')
                 elif 'overgrown' in map.lower():
                     embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/7/7d/Bare_Load_Screen_Overgrown_CoD4.jpg/revision/latest?cb=20110727174104')
                 elif 'pipeline' in map.lower():
