@@ -280,7 +280,7 @@ class DiscordPlugin(b3.plugin.Plugin):
                     embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')                    
 
             elif 'cod6' in game.lower():
-                embed = DiscordEmbed(self.url, color=0xBFB8E3)
+                embed = DiscordEmbed(self.url, color=0xC19640)
                 embed.set_gamename(name='Call of Duty: Modern Warfare 2', icon='https://i.gyazo.com/758b6933287392106bfdddc24b09d502.png')
 
                 if 'afghan' in map.lower():
