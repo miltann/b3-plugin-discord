@@ -1,8 +1,15 @@
 # ![BigBrotherBot](http://i.imgur.com/7sljo4G.png) b3-plugin-discord
 Sends report messages to Discord using Discord webhooks. 
 
-![Report Example](https://i.gyazo.com/453dcbf99baf2f92067919996666b9ad.png)
+Images available for Call of Duty: Modern Warfare 3, Call of Duty: Black Ops 2, Call of Duty 4: Modern Warfare.
+![Report Example](https://i.gyazo.com/6d689a99e99aafe84d592afa3ab35fde.png)
 ![Report Example](https://i.gyazo.com/20fc9da7f1e6f07ce3f217b69f5489c6.png)
+![Report Example](https://i.gyazo.com/3110854464e4a86be286202ddd345fd6.png)
+
+
+If ingame images haven't been added, it will show default pictures.
+![Report Example](https://i.gyazo.com/2ffd11b9c6dd931107dcdce98c232ad9.png)
+
 
 See it in action: https://discord.gg/x499c9k
 
