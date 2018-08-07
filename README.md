@@ -17,9 +17,9 @@ See it in action: https://discord.gg/x499c9k
 ### Requirements
 - If you have B3 1.10 or higher, it should work out of the box.
 
-- For B3 1.9.2 Python version **(not windows-standalone)**
-- `requests` module
-  - install with `pip install requests`
+- For B3 1.9.2 Python version **(not windows-standalone)** :
+  - `requests` module required
+    - install with `pip install requests`
 ---------
 ### Installation
 
