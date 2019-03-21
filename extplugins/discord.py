@@ -35,29 +35,39 @@
 #  - corrected json parsing
 #  - added comments for easier comprehension
 #  16.06.2018 - v1.4 - WatchMiltan
-#  - added thumbnails and icons for cod4 
+#  - added thumbnails and icons for cod4
 #  - added thumbnails and icons for cod6 (MW2)
+#  19.11.2018 - v1.5 - WatchMiltan
+#  - notifications sent if player gets banned/kicked
+#  20.01.2019 - v1.6 - WatchMiltan
+#  - notifications sent if player gets tempbanned
+#  12.02.2019 - v1.7 - WatchMiltan
+#  - notification sent if player leaves the game
+#  14.02.2019 - v1.8 - WatchMiltan
+#  - added clean command, sends notification if player has been checked
+#  15.02.2019 - v1.9 - WatchMiltan
+#  - improved code & cleanup
+#  21.03.2019 - v2.0 - WatchMiltan
+#  - code cleanup
+#  - fixed event order
 #
 
-__version__ = '1.4gh'
+__version__ = '2.0gh'
 __author__  = 'WatchMiltan'
 
-#b3 libaries
 import b3
 import b3.events
 import b3.plugin
+from b3 import functions
 
-#libaries for webhook and embed
-import requests 
+import requests
 import json
 import datetime
 import time
 import re
 from collections import defaultdict
 
-
-#discord embed formatting
-class DiscordEmbed: 
+class DiscordEmbed:
     def __init__(self, url, **kwargs):
         self.url = url
         self.color = kwargs.get('color')
@@ -65,6 +75,7 @@ class DiscordEmbed:
         self.gamename_icon = kwargs.get('author_icon')
         self.fields = kwargs.get('fields', [])
         self.mapview = kwargs.get('thumbnail')
+        self.desc = kwargs.get('desc')
         self.footnote = kwargs.get('footer')
 
     def set_gamename(self, **kwargs):
@@ -74,11 +85,13 @@ class DiscordEmbed:
     def set_mapview(self, url):
         self.mapview = url
 
+    def set_desc(self, desc):
+        self.desc = desc
+
     def textbox(self,**kwargs):
-        name = kwargs.get('name')
-        value = kwargs.get('value')
-        inline = kwargs.get('inline', True)
-        field = {'name' : name, 'value' : value, 'inline' : inline}
+        field = {'name' : kwargs.get('name'),
+                'value' : kwargs.get('value'), 
+                'inline' : kwargs.get('inline', True)}
         self.fields.append(field)
 
     def set_footnote(self,**kwargs):
@@ -86,7 +99,7 @@ class DiscordEmbed:
         self.ts = str(datetime.datetime.utcfromtimestamp(time.time()))
 
     @property
-    def push(self, *arg): #compiling push data to be sent to discord
+    def push(self, *arg):
         data = {}
         data["embeds"] = []
         embed = defaultdict(dict)
@@ -95,6 +108,7 @@ class DiscordEmbed:
         if self.gamename_icon: embed["author"]["icon_url"] = self.gamename_icon
         if self.color: embed["color"] = self.color
         if self.mapview: embed["thumbnail"]['url'] = self.mapview
+        if self.desc: embed["description"] = self.desc
         if self.footnote: embed["footer"]['text'] = self.footnote
         if self.ts: embed["timestamp"] = self.ts
 
@@ -112,19 +126,111 @@ class DiscordEmbed:
         if empty: data['embeds'] = []
         return json.dumps(data)
 
-    def post(self): #push data to webhook
+    def post(self):
         headers = {'Content-Type': 'application/json'}
         result = requests.post(self.url, data=self.push, headers=headers)
-        
+
 
 class DiscordPlugin(b3.plugin.Plugin):
     _adminPlugin = None
-
+    
     def onLoadConfig(self):
         self.url = str(self.config.get('settings', 'webhook'))
         return
 
     def onStartup(self):
+        self.reportedplayers = []
+        self.gamelist = {
+        'cod8' : {
+          'color': 0x97C928,
+          'name': 'Call of Duty: Modern Warfare 3',
+          'icon': 'https://orig00.deviantart.net/9af1/f/2011/310/2/1/modern_warfare_3_logo_by_wifsimster-d4f9ozd.png',
+          'dome': 'https://vignette.wikia.nocookie.net/callofduty/images/f/f1/Bare_Load_Screen_Dome_MW3.png',
+          'terminal':'https://vignette.wikia.nocookie.net/callofduty/images/6/68/Terminal_Loading_Screen_MW3.png',
+          'alpha': 'https://vignette.wikia.nocookie.net/callofduty/images/a/a6/Lockdown_loading_screen_MW3.PNG',
+          'bootleg': 'https://vignette.wikia.nocookie.net/callofduty/images/0/08/Bare_Load_Screen_Bootleg_MW3.png',
+          'carbon': 'https://vignette.wikia.nocookie.net/callofduty/images/c/c8/Bare_Load_Screen_Carbon_MW3.png',
+          'exchange': 'https://vignette.wikia.nocookie.net/callofduty/images/b/bb/Loading_Screen_Flood_the_Market_MW3.png',
+          'harthat': 'https://vignette.wikia.nocookie.net/callofduty/images/c/c0/Hardhat_Load_Screen_CODO.png/revision/latest?cb=20171230164642',
+          'interchange': 'https://vignette.wikia.nocookie.net/callofduty/images/4/4b/Bare_Load_Screen_Interchange_MW3.png',
+          'paris': 'https://vignette.wikia.nocookie.net/callofduty/images/a/a7/Iron_Lady_MW3.png',
+          'plaza2': 'https://vignette.wikia.nocookie.net/callofduty/images/6/6d/Mall_Interior_Arkaden_MW3.png',
+          'seatown': 'https://vignette.wikia.nocookie.net/callofduty/images/a/a7/Bare_Load_Screen_Seatown_MW3.png/revision/latest?cb=20120320235504',
+          'underground': 'https://vignette.wikia.nocookie.net/callofduty/images/0/09/Bare_Load_Screen_Underground_MW3.png',
+          'village': 'https://vignette.wikia.nocookie.net/callofduty/images/f/f4/Bare_Load_Screen_Village_MW3.png'
+        },
+
+        't6' : {    
+          'color': 1,
+          'name': 'Call of Duty: Black Ops 2',
+          'icon': 'https://i.pinimg.com/originals/5a/44/5c/5a445c5c733c698b32732550ec797e91.jpg', 
+          'mp_la': 'https://vignette.wikia.nocookie.net/callofduty/images/b/ba/Aftermath_loading_screen_BOII.png',
+          'carrier': 'https://vignette.wikia.nocookie.net/callofduty/images/8/88/Carrier_loadscreen_BOII.png',
+          'drone': 'https://vignette.wikia.nocookie.net/callofduty/images/5/5b/Drone_loadscreen_BOII.png',
+          'express': 'https://vignette.wikia.nocookie.net/callofduty/images/b/b1/Express_bullet_train_BOII.png/revision/latest?cb=20130224044951',
+          'hijacked':'https://vignette.wikia.nocookie.net/callofduty/images/4/42/Hijacked..png/revision/latest?cb=20130407201845&path-prefix=de',
+          'meltdown': 'https://vignette.wikia.nocookie.net/callofduty/images/f/f2/Meltdown..png/revision/latest?cb=20130506221321&path-prefix=de',
+          'overflow':'https://vignette.wikia.nocookie.net/callofduty/images/8/80/Overflow_Load_Screen_BOII.png',
+          'nightclub': 'https://vignette.wikia.nocookie.net/callofduty/images/7/74/Plaza_Load_Screen_BOII.png',
+          'raid': 'https://vignette.wikia.nocookie.net/callofduty/images/2/29/Raid_Load_Screen_BOII.png',
+          'slums': 'https://vignette.wikia.nocookie.net/callofduty/images/0/04/Slums_Load_Screen_BOII.png/revision/latest?cb=20121209080826',
+          'village': 'https://vignette.wikia.nocookie.net/callofduty/images/5/50/Turbine_Load_Screen_BOII.png',
+          'turbine': 'https://vignette.wikia.nocookie.net/callofduty/images/5/50/Turbine_Load_Screen_BOII.png',
+          'socotra': 'https://vignette.wikia.nocookie.net/callofduty/images/6/6d/Yemen_Load_Screen_BOII.png',
+          'nuketown': 'https://vignette.wikia.nocookie.net/callofduty/images/5/52/Nuketown_2015..png/revision/latest?cb=20130210235047&path-prefix=de'
+        },
+        
+        'cod4' : {    
+          'color': 0x296731,
+          'name': 'Call of Duty 4: Modern Warfare',
+          'icon': 'http://orig05.deviantart.net/8749/f/2008/055/0/c/call_of_duty_4__dock_icon_by_watts240.png',
+          'backlot': 'https://vignette.wikia.nocookie.net/callofduty/images/0/0f/Backlot_loadscreen_CoD4.jpg',
+          'bloc': 'https://vignette.wikia.nocookie.net/callofduty/images/9/9d/Bare_Load_Screen_Bloc_CoD4.jpg',
+          'bog': 'https://vignette.wikia.nocookie.net/callofduty/images/2/29/Bog_Map_Image_CoD4.jpg/revision/latest?cb=20100723075648',
+          'cargoship': 'https://vignette.wikia.nocookie.net/callofduty/images/e/e5/Cod4_map_wetwork.jpg',
+          'citystreets': 'https://vignette.wikia.nocookie.net/callofduty/images/9/92/Cod4_map_district.jpg',
+          'convoy': 'https://vignette.wikia.nocookie.net/callofduty/images/3/3c/Bare_Load_Screen_Ambush_CoD4.jpg/revision/latest?cb=20100723075603',
+          'countdown': 'https://vignette.wikia.nocookie.net/callofduty/images/e/e9/Bare_Load_Screen_Countdown_CoD4.jpg/revision/latest?cb=20100723075829',
+          'crash': 'https://vignette.wikia.nocookie.net/callofduty/images/9/90/Bare_Load_Screen_Crash_CoD4.jpg/revision/latest?cb=20110727174701',
+          'crossfire': 'https://vignette.wikia.nocookie.net/callofduty/images/5/53/Cod4_map_crossfire.jpg/revision/latest?cb=20100723075954',
+          'farm': 'https://vignette.wikia.nocookie.net/callofduty/images/8/82/Bare_Load_Screen_Downpur_CoD4.jpg/revision/latest?cb=20110727175118',
+          'overgrown': 'https://vignette.wikia.nocookie.net/callofduty/images/7/7d/Bare_Load_Screen_Overgrown_CoD4.jpg/revision/latest?cb=20110727174104',
+          'pipeline': 'https://vignette.wikia.nocookie.net/callofduty/images/2/29/Cod4_map_pipeline.jpg/revision/latest?cb=20100723080432',
+          'shipment': 'https://vignette.wikia.nocookie.net/callofduty/images/9/9b/Shipment_Load.jpg/revision/latest?cb=20100723080524',
+          'showdown': 'https://vignette.wikia.nocookie.net/callofduty/images/1/1f/Showdown_Overview_CoD4.jpg/revision/latest?cb=20120519205219',
+          'strike': 'https://vignette.wikia.nocookie.net/callofduty/images/b/b0/Loadscreen_mp_strike.jpg/revision/latest?cb=20100712195725',
+          'vacant': 'https://vignette.wikia.nocookie.net/callofduty/images/f/f6/Cod4_map_vacant.jpg/revision/latest?cb=20100723080839',
+          'snow': 'https://vignette.wikia.nocookie.net/callofduty/images/f/f7/Bare_Load_Screen_Winter_Crash_CoD4.jpg/revision/latest?cb=20100723080720',
+          'broadcast': 'https://vignette.wikia.nocookie.net/callofduty/images/e/ec/Broadcast_loading_screen_CoD4.jpg/revision/latest?cb=20100723080927',
+          'carentan': 'https://vignette.wikia.nocookie.net/callofduty/images/9/95/Carentan_View_1_WWII.jpg/revision/latest?cb=20171223000154',
+          'creek': 'https://vignette.wikia.nocookie.net/callofduty/images/e/e1/CreekCOD4.jpg/revision/latest?cb=20100723075941',
+          'killhouse': 'https://vignette.wikia.nocookie.net/callofduty/images/4/48/Cod4-killhouse.jpg/revision/latest?cb=20100723081127'
+        },
+        
+        'cod6' : {    
+          'color': 0xC19640,
+          'name': 'Call of Duty: Modern Warfare 2',
+          'icon': 'https://i.gyazo.com/758b6933287392106bfdddc24b09d502.png',
+          'afghan': 'https://vignette.wikia.nocookie.net/callofduty/images/8/83/Afghan_loading_screen_MW2.png/revision/latest?cb=20130310131229',
+          'boneyard': 'https://vignette.wikia.nocookie.net/callofduty/images/e/ef/Scrapyard.jpg/revision/latest?cb=20100720174413',
+          'brecourt': 'https://vignette.wikia.nocookie.net/callofduty/images/c/cc/Wasteland.jpg/revision/latest?cb=20100720174520',
+          'checkpoint': 'https://vignette.wikia.nocookie.net/callofduty/images/9/9f/Karachi-prev.jpg/revision/latest?cb=20100720174412',
+          'derail': 'https://vignette.wikia.nocookie.net/callofduty/images/2/20/Derail.jpg/revision/latest?cb=20100720174408',
+          'estate': 'https://vignette.wikia.nocookie.net/callofduty/images/9/91/Estate.jpg/revision/latest?cb=20100720174409',
+          'favela': 'https://vignette.wikia.nocookie.net/callofduty/images/2/29/Favela_Map_MW2.jpg/revision/latest?cb=20100720174410',
+          'highrise': 'https://vignette.wikia.nocookie.net/callofduty/images/4/49/Highrise-promo.jpg/revision/latest?cb=20100720174411',
+          'invasion': 'https://vignette.wikia.nocookie.net/callofduty/images/9/95/Invasion_MW2.jpg/revision/latest?cb=20100720174410',
+          'nightshift': 'https://vignette.wikia.nocookie.net/callofduty/images/d/d2/Skidrow.jpg/revision/latest?cb=20100720174516',
+          'quarry': 'https://vignette.wikia.nocookie.net/callofduty/images/8/8a/Loadscreen_mp_quarry.jpg/revision/latest?cb=20091207173135',
+          'rundown': 'https://vignette.wikia.nocookie.net/callofduty/images/3/3a/Rundown-prev.jpg/revision/latest?cb=20100720174412',
+          'rust': 'https://vignette.wikia.nocookie.net/callofduty/images/3/33/Rust.jpg/revision/latest?cb=20100720174413',
+          'subbase': 'https://vignette.wikia.nocookie.net/callofduty/images/1/1e/Sub_Base.jpg/revision/latest?cb=20100720174517',
+          'terminal': 'https://vignette.wikia.nocookie.net/callofduty/images/1/14/Bare_Load_Screen_Terminal_MW2.jpg/revision/latest?cb=20100720174519',
+          'underpass': 'https://vignette.wikia.nocookie.net/callofduty/images/b/b5/Underpass.jpg/revision/latest?cb=20100720174519'
+        }
+        }
+        
+        
         self._adminPlugin = self.console.getPlugin('admin')
         if not self._adminPlugin:
             self.debug('Admin Plugin not found!')
@@ -132,192 +238,103 @@ class DiscordPlugin(b3.plugin.Plugin):
         else:
             self.debug('Plugin successfully loaded')
 
+        self.registerEvent(b3.events.EVT_CLIENT_BAN) #27
+        self.registerEvent(b3.events.EVT_CLIENT_KICK) #26
+        self.registerEvent(b3.events.EVT_CLIENT_BAN_TEMP) #28
+        self.registerEvent(b3.events.EVT_CLIENT_DISCONNECT) #10
         self._adminPlugin.registerCommand(self, 'report', 0, self.cmd_report)
+        self._adminPlugin.registerCommand(self, 'clean', 40, self.cmd_clean)
         self.debug('Report Command registered in admin plugin')
 
-    #remove colorcodes
     def stripColors(self, s):
         return re.sub('\^[0-9]{1}','',s)
 
-    def cmd_report(self, data, client=None, cmd=None):
+    def onEvent(self, event):
+        if event.type and event.client.name in self.reportedplayers:
+            lastBan = event.client.lastBan
+            embed = DiscordEmbed(self.url, color=0xFFFFFF)
+            if not (event.type == b3.events.EVT_CLIENT_DISCONNECT):
+                embed.set_mapview('https://www.iconsdb.com/icons/download/green/checkmark-16.png')
+            
+            if (event.type == b3.events.EVT_CLIENT_DISCONNECT):
+                if (event.type == b3.events.EVT_CLIENT_BAN):
+                    self.debug("Shouldn't happen")
+
+            if (event.type == b3.events.EVT_CLIENT_KICK): 
+                embed.set_desc("%s has been kicked." % (event.client.name))
+                embed.set_footnote()
+            elif (event.type == b3.events.EVT_CLIENT_BAN):
+                embed.set_desc(event.client.name +" has been banned by " + self._adminPlugin.findClientPrompt('@%s' % str(lastBan.adminId), None).name)
+                embed.set_footnote(text="Reason: " + self.stripColors(lastBan.reason.replace(',', '')))
+            elif (event.type == b3.events.EVT_CLIENT_BAN_TEMP):
+                embed.set_desc("%s has been temporarily banned by %s for %s" % (event.client.name, self._adminPlugin.findClientPrompt('@%s' % str(lastBan.adminId), None).name, functions.minutesStr(lastBan.duration)))
+                embed.set_footnote(text="Reason: " + self.stripColors(lastBan.reason.replace(',', '')))
+            elif (event.type == b3.events.EVT_CLIENT_DISCONNECT) and not lastBan:
+                embed.set_desc("%s has left the game." % (event.client.name))
+                embed.set_footnote()
+                
+            embed.post()
+            self.reportedplayers.remove(event.client.name)
+        if len(self.reportedplayers) > 6:
+            self.reportedplayers.pop(0)
+    
+    def cmd_clean(self, data, client=None, cmd=None):
         if not data:
-            client.message('^1Incorrect report syntax.')
+            client.message('^1Incorrect syntax. !clean <player>')
             return False
         else:
             input = self._adminPlugin.parseUserCmd(data)
 
             if not self._adminPlugin.findClientPrompt(input[0], client):
-                #player not amoung connected clients
-                client.message('Player ^1not found.')
+                return False
+                
+            player = str(self._adminPlugin.findClientPrompt(input[0], client)).split(':')[2]
+            cleanplayer = player[1:-1]
+            
+            if cleanplayer in self.reportedplayers:
+                self.reportedplayers.remove(cleanplayer)
+                embed = DiscordEmbed(self.url, color=0xFFFFFF)
+                embed.set_mapview('https://www.iconsdb.com/icons/download/green/checkmark-16.png')
+                embed.set_desc("%s has been checked by %s" % (cleanplayer, self.stripColors(client.exactName)))
+                embed.set_footnote()
+                embed.post()
+                client.message('Player has been checked.')
+            elif cleanplayer not in self.reportedplayers:
+                client.message('Player was ^1not reported.')
                 return False
 
-            cheater_id_b3 = str(self._adminPlugin.findClientPrompt(input[0], client))
-            cheater = cheater_id_b3.split(':')[2]
-            reporter = self.stripColors(client.exactName)
 
+    def cmd_report(self, data, client=None, cmd=None):
+        if not data:
+            client.message('^1Incorrect syntax. !report <player>')
+            return False
+        else:
+            input = self._adminPlugin.parseUserCmd(data)
+
+            if not self._adminPlugin.findClientPrompt(input[0], client):
+                return False
+
+            cheater = str(self._adminPlugin.findClientPrompt(input[0], client)).split(':')[2]
+            reporter = self.stripColors(client.exactName)
+            
             dict = self.console.game.__dict__
             server = self.stripColors(str(dict['sv_hostname']))
-            map = dict['_mapName']
-            game = dict['gameName']
+            map = dict['_mapName'].lower()
+            game = dict['gameName'].lower()
 
-            #constructing embedded message to be sent on server
-            if 'cod8' in game.lower() or 'iw5' in game.lower():
-                embed = DiscordEmbed(self.url, color=0x97C928)
-                embed.set_gamename(name='Call of Duty: Modern Warfare 3', icon='https://orig00.deviantart.net/9af1/f/2011/310/2/1/modern_warfare_3_logo_by_wifsimster-d4f9ozd.png')
+            if cheater[1:-1] not in self.reportedplayers:
+                self.reportedplayers.append(cheater[1:-1])
 
-                #changing mapview according to mapname
-                if 'dome' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f1/Bare_Load_Screen_Dome_MW3.png')
-                elif 'terminal' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/6/68/Terminal_Loading_Screen_MW3.png')
-                elif 'alpha' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/a/a6/Lockdown_loading_screen_MW3.PNG')
-                elif 'bootleg' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/0/08/Bare_Load_Screen_Bootleg_MW3.png')
-                elif 'carbon' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/c/c8/Bare_Load_Screen_Carbon_MW3.png')
-                elif 'exchange' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/bb/Loading_Screen_Flood_the_Market_MW3.png')
-                elif 'harthat' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/5a/Bare_Load_Screen_Hardhat_MW3.png')
-                elif 'interchange' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/4/4b/Bare_Load_Screen_Interchange_MW3.png')
-                elif 'paris' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/a/a7/Iron_Lady_MW3.png')
-                elif 'plaza2' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/6/6d/Mall_Interior_Arkaden_MW3.png')
-                elif 'seatown' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/a/a7/Bare_Load_Screen_Seatown_MW3.png/revision/latest?cb=20120320235504')
-                elif 'underground' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/0/09/Bare_Load_Screen_Underground_MW3.png')
-                elif 'village' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f4/Bare_Load_Screen_Village_MW3.png')
-                else:
-                    embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
+            if game in self.gamelist:
+                gamelist = self.gamelist[game]
+                embed = DiscordEmbed(self.url, color=gamelist['color'])
+                embed.set_gamename(name=gamelist['name'], icon=gamelist['icon'])
+                embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
+                
+                for key in gamelist:
+                    if key in map:
+                        embed.set_mapview(gamelist[key])
 
-            elif 't6' in game.lower():
-                embed = DiscordEmbed(self.url, color=1)
-                embed.set_gamename(name='Call of Duty: Black Ops 2', icon='https://i.pinimg.com/originals/5a/44/5c/5a445c5c733c698b32732550ec797e91.jpg')
-
-                if 'mp_la' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/ba/Aftermath_loading_screen_BOII.png')
-                elif 'carrier' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/88/Carrier_loadscreen_BOII.png')
-                elif 'drone' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/5b/Drone_loadscreen_BOII.png')
-                elif 'express' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/b1/Express_bullet_train_BOII.png/revision/latest?cb=20130224044951')
-                elif 'hijacked' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/4/42/Hijacked..png/revision/latest?cb=20130407201845&path-prefix=de')
-                elif 'meltdown' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f2/Meltdown..png/revision/latest?cb=20130506221321&path-prefix=de')
-                elif 'overflow' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/80/Overflow_Load_Screen_BOII.png')
-                elif 'nightclub' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/7/74/Plaza_Load_Screen_BOII.png')
-                elif 'raid' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Raid_Load_Screen_BOII.png')
-                elif 'slums' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/0/04/Slums_Load_Screen_BOII.png/revision/latest?cb=20121209080826')
-                elif 'village' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f7/Standoff..png/revision/latest?cb=20130429072412&path-prefix=de')
-                elif 'turbine' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/50/Turbine_Load_Screen_BOII.png')
-                elif 'socotra' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/6/6d/Yemen_Load_Screen_BOII.png')
-                elif 'nuketown' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/52/Nuketown_2015..png/revision/latest?cb=20130210235047&path-prefix=de')
-                else:
-                    embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')
-                    
-            elif 'cod4' in game.lower():
-                embed = DiscordEmbed(self.url, color=0x296731)
-                embed.set_gamename(name='Call of Duty 4: Modern Warfare', icon='http://orig05.deviantart.net/8749/f/2008/055/0/c/call_of_duty_4__dock_icon_by_watts240.png')
-
-                if 'backlot' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/0/0f/Backlot_loadscreen_CoD4.jpg')
-                elif 'bloc' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/9d/Bare_Load_Screen_Bloc_CoD4.jpg')
-                elif 'bog' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Bog_Map_Image_CoD4.jpg/revision/latest?cb=20100723075648')
-                elif 'cargoship' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/e5/Cod4_map_wetwork.jpg')
-                elif 'citystreets' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/92/Cod4_map_district.jpg')
-                elif 'convoy' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/3/3c/Bare_Load_Screen_Ambush_CoD4.jpg/revision/latest?cb=20100723075603')
-                elif 'countdown' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/e9/Bare_Load_Screen_Countdown_CoD4.jpg/revision/latest?cb=20100723075829')
-                elif 'crash' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/90/Bare_Load_Screen_Crash_CoD4.jpg/revision/latest?cb=20110727174701')
-                elif 'crossfire' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/5/53/Cod4_map_crossfire.jpg/revision/latest?cb=20100723075954')
-                elif 'farm' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/82/Bare_Load_Screen_Downpour_CoD4.jpg/revision/latest?cb=20110727175118')
-                elif 'overgrown' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/7/7d/Bare_Load_Screen_Overgrown_CoD4.jpg/revision/latest?cb=20110727174104')
-                elif 'pipeline' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Cod4_map_pipeline.jpg/revision/latest?cb=20100723080432')
-                elif 'shipment' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/9b/Shipment_Load.jpg/revision/latest?cb=20100723080524')
-                elif 'showdown' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/1/1f/Showdown_Overview_CoD4.jpg/revision/latest?cb=20120519205219')                    
-                elif 'strike' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/b0/Loadscreen_mp_strike.jpg/revision/latest?cb=20100712195725')
-                elif 'vacant' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f6/Cod4_map_vacant.jpg/revision/latest?cb=20100723080839')
-                elif 'snow' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/f/f7/Bare_Load_Screen_Winter_Crash_CoD4.jpg/revision/latest?cb=20100723080720')
-                elif 'broadcast' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/ec/Broadcast_loading_screen_CoD4.jpg/revision/latest?cb=20100723080927')
-                elif 'carentan' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/95/Carentan_View_1_WWII.jpg/revision/latest?cb=20171223000154')
-                elif 'creek' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/e1/CreekCOD4.jpg/revision/latest?cb=20100723075941')
-                elif 'killhouse' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/4/48/Cod4-killhouse.jpg/revision/latest?cb=20100723081127')
-                else:
-                    embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')                    
-
-            elif 'cod6' in game.lower():
-                embed = DiscordEmbed(self.url, color=0xC19640)
-                embed.set_gamename(name='Call of Duty: Modern Warfare 2', icon='https://i.gyazo.com/758b6933287392106bfdddc24b09d502.png')
-
-                if 'afghan' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/83/Afghan_loading_screen_MW2.png/revision/latest?cb=20130310131229')
-                elif 'boneyard' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/e/ef/Scrapyard.jpg/revision/latest?cb=20100720174413')
-                elif 'brecourt' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/c/cc/Wasteland.jpg/revision/latest?cb=20100720174520')
-                elif 'checkpoint' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/9f/Karachi-prev.jpg/revision/latest?cb=20100720174412')
-                elif 'derail' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/20/Derail.jpg/revision/latest?cb=20100720174408')
-                elif 'estate' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/91/Estate.jpg/revision/latest?cb=20100720174409')
-                elif 'favela' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/2/29/Favela_Map_MW2.jpg/revision/latest?cb=20100720174410')
-                elif 'highrise' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/4/49/Highrise-promo.jpg/revision/latest?cb=20100720174411')
-                elif 'invasion' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/9/95/Invasion_MW2.jpg/revision/latest?cb=20100720174410')
-                elif 'nightshift' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/d/d2/Skidrow.jpg/revision/latest?cb=20100720174516')
-                elif 'quarry' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/8/8a/Loadscreen_mp_quarry.jpg/revision/latest?cb=20091207173135')
-                elif 'rundown' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/3/3a/Rundown-prev.jpg/revision/latest?cb=20100720174412')
-                elif 'rust' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/3/33/Rust.jpg/revision/latest?cb=20100720174413')
-                elif 'subbase' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/1/1e/Sub_Base.jpg/revision/latest?cb=20100720174517')
-                elif 'terminal' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/1/14/Bare_Load_Screen_Terminal_MW2.jpg/revision/latest?cb=20100720174519')
-                elif 'underpass' in map.lower():
-                    embed.set_mapview('https://vignette.wikia.nocookie.net/callofduty/images/b/b5/Underpass.jpg/revision/latest?cb=20100720174519')
-                else:
-                    embed.set_mapview('https://cdn0.iconfinder.com/data/icons/flat-design-basic-set-1/24/error-exclamation-512.png')                    
-                    
             else:
                 embed = DiscordEmbed(self.url, color=0xFF0000)
                 embed.set_gamename(name='Cheater Report: '+ game)
@@ -327,5 +344,4 @@ class DiscordPlugin(b3.plugin.Plugin):
             embed.textbox(name='Server', value=server)
             embed.set_footnote(text='reported by '+ reporter)
             embed.post()
-            self.debug('Report message sent to Discord.')
-            client.message('^2Player has been reported on Discord!')
+            client.message('Player has been ^2reported on Discord!')
