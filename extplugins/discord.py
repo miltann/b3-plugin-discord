@@ -50,6 +50,7 @@
 #  21.03.2019 - v2.0 - WatchMiltan
 #  - code cleanup
 #  - fixed event order
+#  - added thumbnails and icons for cod7 (BO)
 #
 
 __version__ = '2.0gh'
@@ -206,30 +207,49 @@ class DiscordPlugin(b3.plugin.Plugin):
           'creek': 'https://vignette.wikia.nocookie.net/callofduty/images/e/e1/CreekCOD4.jpg/revision/latest?cb=20100723075941',
           'killhouse': 'https://vignette.wikia.nocookie.net/callofduty/images/4/48/Cod4-killhouse.jpg/revision/latest?cb=20100723081127'
         },
-        
+                
         'cod6' : {    
           'color': 0xC19640,
           'name': 'Call of Duty: Modern Warfare 2',
           'icon': 'https://i.gyazo.com/758b6933287392106bfdddc24b09d502.png',
-          'afghan': 'https://vignette.wikia.nocookie.net/callofduty/images/8/83/Afghan_loading_screen_MW2.png/revision/latest?cb=20130310131229',
-          'boneyard': 'https://vignette.wikia.nocookie.net/callofduty/images/e/ef/Scrapyard.jpg/revision/latest?cb=20100720174413',
-          'brecourt': 'https://vignette.wikia.nocookie.net/callofduty/images/c/cc/Wasteland.jpg/revision/latest?cb=20100720174520',
-          'checkpoint': 'https://vignette.wikia.nocookie.net/callofduty/images/9/9f/Karachi-prev.jpg/revision/latest?cb=20100720174412',
-          'derail': 'https://vignette.wikia.nocookie.net/callofduty/images/2/20/Derail.jpg/revision/latest?cb=20100720174408',
-          'estate': 'https://vignette.wikia.nocookie.net/callofduty/images/9/91/Estate.jpg/revision/latest?cb=20100720174409',
-          'favela': 'https://vignette.wikia.nocookie.net/callofduty/images/2/29/Favela_Map_MW2.jpg/revision/latest?cb=20100720174410',
-          'highrise': 'https://vignette.wikia.nocookie.net/callofduty/images/4/49/Highrise-promo.jpg/revision/latest?cb=20100720174411',
-          'invasion': 'https://vignette.wikia.nocookie.net/callofduty/images/9/95/Invasion_MW2.jpg/revision/latest?cb=20100720174410',
-          'nightshift': 'https://vignette.wikia.nocookie.net/callofduty/images/d/d2/Skidrow.jpg/revision/latest?cb=20100720174516',
-          'quarry': 'https://vignette.wikia.nocookie.net/callofduty/images/8/8a/Loadscreen_mp_quarry.jpg/revision/latest?cb=20091207173135',
-          'rundown': 'https://vignette.wikia.nocookie.net/callofduty/images/3/3a/Rundown-prev.jpg/revision/latest?cb=20100720174412',
-          'rust': 'https://vignette.wikia.nocookie.net/callofduty/images/3/33/Rust.jpg/revision/latest?cb=20100720174413',
-          'subbase': 'https://vignette.wikia.nocookie.net/callofduty/images/1/1e/Sub_Base.jpg/revision/latest?cb=20100720174517',
-          'terminal': 'https://vignette.wikia.nocookie.net/callofduty/images/1/14/Bare_Load_Screen_Terminal_MW2.jpg/revision/latest?cb=20100720174519',
-          'underpass': 'https://vignette.wikia.nocookie.net/callofduty/images/b/b5/Underpass.jpg/revision/latest?cb=20100720174519'
-        }
-        }
+          'mp_afghan': 'https://vignette.wikia.nocookie.net/callofduty/images/8/83/Afghan_loading_screen_MW2.png/revision/latest?cb=20130310131229',
+          'mp_boneyard': 'https://vignette.wikia.nocookie.net/callofduty/images/e/ef/Scrapyard.jpg/revision/latest?cb=20100720174413',
+          'mp_brecourt': 'https://vignette.wikia.nocookie.net/callofduty/images/c/cc/Wasteland.jpg/revision/latest?cb=20100720174520',
+          'mp_checkpoint': 'https://vignette.wikia.nocookie.net/callofduty/images/9/9f/Karachi-prev.jpg/revision/latest?cb=20100720174412',
+          'mp_derail': 'https://vignette.wikia.nocookie.net/callofduty/images/2/20/Derail.jpg/revision/latest?cb=20100720174408',
+          'mp_estate': 'https://vignette.wikia.nocookie.net/callofduty/images/9/91/Estate.jpg/revision/latest?cb=20100720174409',
+          'mp_favela': 'https://vignette.wikia.nocookie.net/callofduty/images/2/29/Favela_Map_MW2.jpg/revision/latest?cb=20100720174410',
+          'mp_highrise': 'https://vignette.wikia.nocookie.net/callofduty/images/4/49/Highrise-promo.jpg/revision/latest?cb=20100720174411',
+          'mp_invasion': 'https://vignette.wikia.nocookie.net/callofduty/images/9/95/Invasion_MW2.jpg/revision/latest?cb=20100720174410',
+          'mp_nightshift': 'https://vignette.wikia.nocookie.net/callofduty/images/d/d2/Skidrow.jpg/revision/latest?cb=20100720174516',
+          'mp_quarry': 'https://vignette.wikia.nocookie.net/callofduty/images/8/8a/Loadscreen_mp_quarry.jpg/revision/latest?cb=20091207173135',
+          'mp_rundown': 'https://vignette.wikia.nocookie.net/callofduty/images/3/3a/Rundown-prev.jpg/revision/latest?cb=20100720174412',
+          'mp_rust': 'https://vignette.wikia.nocookie.net/callofduty/images/3/33/Rust.jpg/revision/latest?cb=20100720174413',
+          'mp_subbase': 'https://vignette.wikia.nocookie.net/callofduty/images/1/1e/Sub_Base.jpg/revision/latest?cb=20100720174517',
+          'mp_terminal': 'https://vignette.wikia.nocookie.net/callofduty/images/1/14/Bare_Load_Screen_Terminal_MW2.jpg/revision/latest?cb=20100720174519',
+          'mp_underpass': 'https://vignette.wikia.nocookie.net/callofduty/images/b/b5/Underpass.jpg/revision/latest?cb=20100720174519'
+        },
         
+        'cod7' : {    
+          'color': 0x18819E,
+          'name': 'Call of Duty: Black Ops',
+          'icon': 'https://i.gyazo.com/93ca65b298bf3738d54304b0f184b5b5.png',
+          'mp_nuked': 'https://vignette.wikia.nocookie.net/callofduty/images/2/2c/Bare_Load_Screen_Nuketown_BO.jpg/revision/latest?cb=20110303122337',
+          'mp_cracked': 'https://vignette.wikia.nocookie.net/callofduty/images/1/1e/Bare_Load_Screen_Cracked_BO.jpg/revision/latest?cb=20110303121738',
+          'mp_array': 'https://vignette.wikia.nocookie.net/callofduty/images/3/35/Bare_Load_Screen_Array_BO.jpg/revision/latest?cb=20110303121651',
+          'mp_crisis': 'https://vignette.wikia.nocookie.net/callofduty/images/f/f6/Bare_Load_Screen_Crisis_BO.jpg/revision/latest?cb=20110303121824',
+          'mp_firingrange': 'https://vignette.wikia.nocookie.net/callofduty/images/8/82/Bare_Load_Screen_Firing_Range_BO.jpg/revision/latest?cb=20110303121918',
+          'mp_duga': 'https://vignette.wikia.nocookie.net/callofduty/images/4/41/Bare_Load_Screen_Grid_BO.jpg/revision/latest?cb=20110303122000',
+          'mp_hanoi': 'https://vignette.wikia.nocookie.net/callofduty/images/e/eb/Bare_Load_Screen_Hanoi_BO.jpg/revision/latest?cb=20110303122041',
+          'mp_cairo': 'https://vignette.wikia.nocookie.net/callofduty/images/e/e7/Bare_Load_Screen_Havana_BO.jpg/revision/latest?cb=20110303122124',
+          'mp_havoc': 'https://vignette.wikia.nocookie.net/callofduty/images/c/c6/Bare_Load_Screen_Jungle_BO.jpg/revision/latest?cb=20110303122217',
+          'mp_cosmodrome': 'https://vignette.wikia.nocookie.net/callofduty/images/c/c6/Bare_Load_Screen_Launch_BO.jpg/revision/latest?cb=20110303122251',
+          'mp_radiation': 'https://vignette.wikia.nocookie.net/callofduty/images/2/20/Bare_Load_Screen_Radiation_BO.jpg/revision/latest?cb=20110303122417',
+          'mp_mountain': 'https://vignette.wikia.nocookie.net/callofduty/images/5/54/Bare_Load_Screen_Summit_BO.jpg/revision/latest?cb=20110303122702',
+          'mp_villa': 'https://vignette.wikia.nocookie.net/callofduty/images/2/2a/Bare_Load_Screen_Villa_BO.jpg/revision/latest?cb=20110303122503',
+          'mp_russianbase': 'https://vignette.wikia.nocookie.net/callofduty/images/1/12/Bare_Load_Screen_WMD_BO.jpg/revision/latest?cb=20110303122544'
+        }
+        }        
         
         self._adminPlugin = self.console.getPlugin('admin')
         if not self._adminPlugin:
