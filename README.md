@@ -4,11 +4,13 @@ Sends report messages to Discord using Discord webhooks.
 - !report &lt;playername&gt; - Sends a report notification to discord.
 - !clean &lt;playername&gt; - Admins can use this command to let the others know that he has been checked
 
-Images available for Call of Duty: Modern Warfare 3, Call of Duty: Black Ops 2, Call of Duty 4: Modern Warfare.
+Images available for Call of Duty: Modern Warfare 3, Call of Duty: Black Ops 2, Call of Duty 4: Modern Warfare and Call of Duty: Black Ops.
+
 ![Report Example](https://i.gyazo.com/6d689a99e99aafe84d592afa3ab35fde.png)
 ![Report Example](https://i.gyazo.com/20fc9da7f1e6f07ce3f217b69f5489c6.png)
 ![Report Example](https://i.gyazo.com/3110854464e4a86be286202ddd345fd6.png)
 ![Report Example](https://i.gyazo.com/97f545fcba56f20e0520aeef459f9a54.png)
+![Report Example](https://i.gyazo.com/c7d6d0e4ba0f19c14a3ec8d12ed695cc.png)
 
 If ingame images haven't been added, it will show default pictures.
 ![Report Example](https://i.gyazo.com/2ffd11b9c6dd931107dcdce98c232ad9.png)
