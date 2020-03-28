@@ -54,6 +54,5 @@ See it in action: https://discord.gg/x499c9k
 ### Disclaimer
 
 The author of this opensource plugin endorse NO responsibility whatsoever for any problem that might arise when using this tool.
-Discord: WatchMiltan#7507
 
 
