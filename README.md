@@ -24,8 +24,6 @@ Will also send notfications when a player **leaves**, gets **banned** or gets **
 ![Kicked](https://i.gyazo.com/1e89a62267feeb61bcf130d9de16cabe.png)
 
 
-See it in action: https://discord.gg/x499c9k
-
 ---------
 ### Requirements
 - If you have B3 1.10 or higher, it should work out of the box.
