@@ -51,7 +51,7 @@
 #  - code cleanup
 #  - fixed event order
 #  - added thumbnails and icons for cod7 (BO)
-#
+#  - report reason, adjust colors, syntax help
 
 __version__ = '2.0gh'
 __author__  = 'WatchMiltan'
@@ -326,14 +326,22 @@ class DiscordPlugin(b3.plugin.Plugin):
 
     def cmd_report(self, data, client=None, cmd=None):
         if not data:
-            client.message('^1Incorrect syntax. !report <player>')
+            client.message('^1Incorrect syntax. !report <player> <reason>')
             return False
         else:
             input = self._adminPlugin.parseUserCmd(data)
 
             if not self._adminPlugin.findClientPrompt(input[0], client):
+                #player not amoung connected clients
+                client.message('Player ^1not found.')
                 return False
 
+            if not input[1]:
+                #no report reason
+                client.message('Reason not supplied!')
+                return False
+            r_reason = input[1]
+            
             cheater = str(self._adminPlugin.findClientPrompt(input[0], client)).split(':')[2]
             reporter = self.stripColors(client.exactName)
             
@@ -362,6 +370,7 @@ class DiscordPlugin(b3.plugin.Plugin):
 
             embed.textbox(name='Reported Player', value=cheater[1:-1])
             embed.textbox(name='Server', value=server)
+            embed.textbox(name='Reason', value=r_reason,inline=False)
             embed.set_footnote(text='reported by '+ reporter)
             embed.post()
-            client.message('Player has been ^2reported on Discord!')
+            client.message('Player has been ^2reported ^7on Discord!')
