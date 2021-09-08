@@ -1,7 +1,7 @@
 # ![BigBrotherBot](http://i.imgur.com/7sljo4G.png) b3-plugin-discord
 Sends report messages to Discord using Discord webhooks. 
 
-- !report &lt;playername&gt; - Sends a report notification to discord.
+- !report &lt;playername&gt;&lt;reason&gt; - Sends a report notification to discord.
 - !clean &lt;playername&gt; - Admins can use this command to let the others know that he has been checked
 
 Images available for Call of Duty: Modern Warfare 3, Call of Duty: Black Ops 2, Call of Duty 4: Modern Warfare and Call of Duty: Black Ops.
@@ -13,6 +13,7 @@ Images available for Call of Duty: Modern Warfare 3, Call of Duty: Black Ops 2, 
 ![Report Example](https://i.gyazo.com/c7d6d0e4ba0f19c14a3ec8d12ed695cc.png)
 
 If ingame images haven't been added, it will show default pictures.
+
 ![Report Example](https://i.gyazo.com/2ffd11b9c6dd931107dcdce98c232ad9.png)
 
 Will also send notfications when a player **leaves**, gets **banned** or gets **kicked** on the server.
