@@ -1,9 +1,10 @@
 # ![BigBrotherBot](http://i.imgur.com/7sljo4G.png) b3-plugin-discord
 Sends report messages to Discord using Discord webhooks. 
 
-- !report &lt;playername&gt;&lt;reason&gt; - Sends a report notification to discord.
+- !report &lt;playername&gt; (optional: &lt;reason&gt;) - Sends a report notification to discord.
 - !clean &lt;playername&gt; - Admins can use this command to let the others know that he has been checked
 
+Players may provide a reason when reporting someone. If you want to force players to provide a reason, you can change the appropriate value in ``conf/discord.xml``. 
 Images available for Call of Duty: Modern Warfare 3, Call of Duty: Black Ops 2, Call of Duty 4: Modern Warfare and Call of Duty: Black Ops.
 
 ![Report Example](https://i.gyazo.com/6d689a99e99aafe84d592afa3ab35fde.png)
