@@ -2,7 +2,7 @@
 # ################################################################### #
 #                                                                     #
 #  Discord Plugin for BigBrotherBot(B3) (www.bigbrotherbot.com)       #
-#  Copyright (c) 2018 Miltan aka WatchMiltan                          #
+#  Copyright (c) 2021 Miltan                                          #
 #                                                                     #
 #  This program is free software; you can redistribute it and/or      #
 #  modify it under the terms of the GNU General Public License        #
@@ -21,39 +21,9 @@
 #                                                                     #
 # ################################################################### #
 #
-#
-#  CHANGELOG:
-#  02.04.2018 - v1.0 - WatchMiltan
-#  - first release.
-#  23.04.2018 - v1.1 - WatchMiltan
-#  - added thumbnails and icons for t6 (BO2)
-#  - using a configuration file to get webhook
-#  29.04.2018 - v1.2 - WatchMiltan
-#  - it actually works now
-#  05.06.2018 - v1.3 - WatchMiltan
-#  - partial rewrite, adjusted colors
-#  - corrected json parsing
-#  - added comments for easier comprehension
-#  16.06.2018 - v1.4 - WatchMiltan
-#  - added thumbnails and icons for cod4
-#  - added thumbnails and icons for cod6 (MW2)
-#  19.11.2018 - v1.5 - WatchMiltan
-#  - notifications sent if player gets banned/kicked
-#  20.01.2019 - v1.6 - WatchMiltan
-#  - notifications sent if player gets tempbanned
-#  12.02.2019 - v1.7 - WatchMiltan
-#  - notification sent if player leaves the game
-#  14.02.2019 - v1.8 - WatchMiltan
-#  - added clean command, sends notification if player has been checked
-#  15.02.2019 - v1.9 - WatchMiltan
-#  - improved code & cleanup
-#  21.03.2019 - v2.0 - WatchMiltan
-#  - code cleanup
-#  - fixed event order
-#  - added thumbnails and icons for cod7 (BO)
-#  - report reason, adjust colors, syntax help
 
-__version__ = '2.0gh'
+
+__version__ = '2.1gh'
 __author__  = 'WatchMiltan'
 
 import b3
@@ -137,6 +107,7 @@ class DiscordPlugin(b3.plugin.Plugin):
     
     def onLoadConfig(self):
         self.url = str(self.config.get('settings', 'webhook'))
+        self.forceReason = bool(int(self.config.get('settings', 'forceReason')))
         return
 
     def onStartup(self):
@@ -326,21 +297,27 @@ class DiscordPlugin(b3.plugin.Plugin):
 
     def cmd_report(self, data, client=None, cmd=None):
         if not data:
-            client.message('^1Incorrect syntax. !report <player> <reason>')
+            if self.forceReason:
+                client.message('^1Incorrect syntax. !report <player> <reason>')
+            else:
+                client.message('^1Incorrect syntax. !report <player> (optional: <reason>)')
             return False
         else:
             input = self._adminPlugin.parseUserCmd(data)
 
-            if not self._adminPlugin.findClientPrompt(input[0], client):
-                #player not amoung connected clients
+            if not self._adminPlugin.findClientPrompt(input[0], client): #player not among connected clients
                 client.message('Player ^1not found.')
                 return False
-
-            if not input[1]:
-                #no report reason
-                client.message('Reason not supplied!')
+                
+            if self.forceReason and not input[1]:
+                client.message('^1Incorrect syntax. !report <player> <reason>')
                 return False
-            r_reason = input[1]
+            elif input[1]:
+                if len(input[1]) <= 100:
+                    r_reason = str(input[1])
+                else:
+                    client.message('Reason too ^1long. Please keep it short.')
+                    return False
             
             cheater = str(self._adminPlugin.findClientPrompt(input[0], client)).split(':')[2]
             reporter = self.stripColors(client.exactName)
@@ -370,7 +347,10 @@ class DiscordPlugin(b3.plugin.Plugin):
 
             embed.textbox(name='Reported Player', value=cheater[1:-1])
             embed.textbox(name='Server', value=server)
-            embed.textbox(name='Reason', value=r_reason,inline=False)
+            
+            if input[1]:
+                embed.textbox(name='Reason', value=r_reason, inline=False)
+            
             embed.set_footnote(text='reported by '+ reporter)
             embed.post()
             client.message('Player has been ^2reported ^7on Discord!')

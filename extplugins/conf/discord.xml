@@ -2,5 +2,7 @@
 	<settings name="settings">
 		<!-- Set your discord webhook here -->
 		<set name="webhook">enter your webhook here</set>
+        <!-- If you want to force players to supply a reason (!report <player> <reason>), set this to 1 -->
+        <set name="forceReason">0</set>        
 	</settings>
 </configuration>
