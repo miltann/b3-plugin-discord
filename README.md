@@ -23,8 +23,6 @@ Will also send notfications when a player **leaves**, gets **banned** or gets **
 ![Tempbanned](https://i.gyazo.com/cfdab1887f807212bcc94ef49c6c93ff.png)
 ![Checked](https://i.gyazo.com/e18682edbfcb0c2463c541171a8b1d56.png)
 ![Banned](https://i.gyazo.com/9b4e4f975dc25f51f1867a3429ae5174.png)
-![Kicked](https://i.gyazo.com/1e89a62267feeb61bcf130d9de16cabe.png)
-
 
 ---------
 ### Requirements
